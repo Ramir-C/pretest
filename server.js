@@ -10,7 +10,7 @@ const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, "public"))); // Sirve index.html desde /public
+app.use(express.static(path.join(__dirname, "public"))); // Servir index.html y estilos desde /public
 
 // Ruta raíz
 app.get("/", (req, res) => {
@@ -37,10 +37,10 @@ db.connect((err) => {
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS respuestas (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      username VARCHAR(100),
-      age INT,
-      grupo VARCHAR(50),
-      escuela VARCHAR(100),
+      username VARCHAR(100) NOT NULL,
+      age INT NOT NULL,
+      grupo VARCHAR(50) NOT NULL,
+      escuela VARCHAR(100) NOT NULL,
       correctCount INT,
       incorrectCount INT,
       correctAnswers TEXT,
@@ -54,12 +54,12 @@ db.connect((err) => {
   });
 });
 
-// Guardar respuestas desde el front-end
+// Guardar respuestas
 app.post("/save", (req, res) => {
   const {
     username,
     age,
-    group,
+    grupo, // mapeado desde front-end
     school,
     correctCount,
     incorrectCount,
@@ -68,7 +68,7 @@ app.post("/save", (req, res) => {
   } = req.body;
 
   // Validación básica
-  if (!username || !age || !group || !school) {
+  if (!username || !age || !grupo || !school) {
     return res.status(400).json({ error: "Datos incompletos" });
   }
 
@@ -80,7 +80,7 @@ app.post("/save", (req, res) => {
 
   db.query(
     query,
-    [username, age, group, school, correctCount, incorrectCount, correctAnswers, incorrectAnswers],
+    [username, age, grupo, school, correctCount, incorrectCount, correctAnswers, incorrectAnswers],
     (err, results) => {
       if (err) {
         console.error("❌ Error guardando datos:", err);
@@ -112,4 +112,5 @@ app.get("/results", (req, res) => {
 app.listen(port, () => {
   console.log(`🚀 Servidor escuchando en http://localhost:${port}`);
 });
+
 
