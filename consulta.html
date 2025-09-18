@@ -48,9 +48,9 @@
 </head>
 <body>
   <h1>Resultados de Respuestas1</h1>
-  <button onclick="cargarDatos()">Consultar Resultados</button>
+  <button onclick="cargarDatos()">Consultar Respuestas1</button>
   
-  <table id="tablaResultados">
+  <table id="tablaRespuestas1">
     <thead>
       <tr>
         <th>ID</th>
@@ -79,7 +79,7 @@
         }
         const data = await response.json();
 
-        const tbody = document.querySelector("#tablaResultados tbody");
+        const tbody = document.querySelector("#tablaRespuestas1 tbody");
         tbody.innerHTML = "";
 
         data.forEach(item => {
