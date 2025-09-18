@@ -35,7 +35,7 @@ db.connect((err) => {
 
   // Crear tabla si no existe
   const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS respuestas (
+    CREATE TABLE IF NOT EXISTS respuestas1 (
       id INT AUTO_INCREMENT PRIMARY KEY,
       username VARCHAR(100) NOT NULL,
       age INT NOT NULL,
@@ -50,7 +50,7 @@ db.connect((err) => {
   `;
   db.query(createTableQuery, (err) => {
     if (err) console.error("❌ Error creando tabla:", err);
-    else console.log("✅ Tabla 'respuestas' lista.");
+    else console.log("✅ Tabla 'respuestas1' lista.");
   });
 });
 
@@ -73,7 +73,7 @@ app.post("/save", (req, res) => {
   }
 
   const query = `
-    INSERT INTO respuestas
+    INSERT INTO respuestas1
     (username, age, grupo, escuela, correctCount, incorrectCount, correctAnswers, incorrectAnswers)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
@@ -99,7 +99,7 @@ app.post("/save", (req, res) => {
 
 // Consultar respuestas
 app.get("/results", (req, res) => {
-  db.query("SELECT * FROM respuestas ORDER BY created_at DESC", (err, rows) => {
+  db.query("SELECT * FROM respuestas1 ORDER BY created_at DESC", (err, rows) => {
     if (err) {
       console.error("❌ Error consultando datos:", err);
       return res.status(500).json({ error: "Error obteniendo respuestas" });
