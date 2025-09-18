@@ -111,16 +111,15 @@
             const formData = new FormData(form);
 
             const userData = {
-                username: formData.get("username"),
-                age: formData.get("age"),
-                group: formData.get("group"),
-                school: formData.get("school"),
-                answers: {},
-                correctCount: 0,
-                incorrectCount: 0,
-                correctAnswers: [],
-                incorrectAnswers: []
-            };
+  username: formData.get('username'),
+  age: formData.get('age'),
+  grupo: formData.get('group'), // mapear group → grupo
+  school: formData.get('school'),
+  correctCount,
+  incorrectCount,
+  correctAnswers,
+  incorrectAnswers
+};
 
             let allAnswered = true;
             for (let i = 1; i <= 10; i++) {
