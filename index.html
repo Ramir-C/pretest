@@ -12,7 +12,7 @@
         <form id="diagnosticForm">
             <label>Nombre de usuario: <input type="text" name="username" required></label><br>
             <label>Edad: <input type="number" name="age" required></label><br>
-            <label>Grupo: <input type="text" name="group" required></label><br>
+            <label>Grupo: <input type="text" name="grupo" required></label><br>
             <label>Escuela: <input type="text" name="school" required></label><br><br>
 
             <!-- Preguntas -->
@@ -113,7 +113,7 @@
            const userData = {
   username: formData.get('username'),
   age: formData.get('age'),
-  grupo: formData.get('group'), // mapear group → grupo
+  grupo: formData.get('grupo'), // mapear group → grupo
   school: formData.get('school'),
   correctCount,
   incorrectCount,
@@ -146,7 +146,7 @@
             userData.incorrectAnswers = userData.incorrectAnswers.join(',');
 
             try {
-                const response = await fetch("/save", {
+                const response = await fetch("/resultados1", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(userData)
