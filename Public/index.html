@@ -144,7 +144,7 @@
             userData.incorrectAnswers = userData.incorrectAnswers.join(',');
 
             try {
-                const response = await fetch("/save", {
+                const response = await fetch("/respuestas1", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(userData)
