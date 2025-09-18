@@ -1,6 +1,8 @@
+// server.js
 const express = require("express");
 const mysql = require("mysql2");
 const bodyParser = require("body-parser");
+const path = require("path");
 require("dotenv").config();
 
 const app = express();
@@ -8,15 +10,17 @@ const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(bodyParser.json());
-app.use(express.static("public")); // Sirve tu index.html
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+app.use(express.static(path.join(__dirname, "public"))); // Sirve index.html desde /public
+
+// Ruta raíz
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // Conexión MySQL
 const db = mysql.createConnection({
   host: process.env.MYSQLHOST,
-  port: process.env.MYSQLPORT,
+  port: process.env.MYSQLPORT || 3306,
   user: process.env.MYSQLUSER,
   password: process.env.MYSQLPASSWORD,
   database: process.env.MYSQLDATABASE
@@ -50,28 +54,47 @@ db.connect((err) => {
   });
 });
 
-// Guardar respuestas
+// Guardar respuestas desde el front-end
 app.post("/save", (req, res) => {
-  const { username, age, group, school, correctCount, incorrectCount, correctAnswers, incorrectAnswers } = req.body;
+  const {
+    username,
+    age,
+    group,
+    school,
+    correctCount,
+    incorrectCount,
+    correctAnswers,
+    incorrectAnswers
+  } = req.body;
+
+  // Validación básica
+  if (!username || !age || !group || !school) {
+    return res.status(400).json({ error: "Datos incompletos" });
+  }
 
   const query = `
-    INSERT INTO respuestas (username, age, grupo, escuela, correctCount, incorrectCount, correctAnswers, incorrectAnswers)
+    INSERT INTO respuestas
+    (username, age, grupo, escuela, correctCount, incorrectCount, correctAnswers, incorrectAnswers)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  db.query(query, [username, age, group, school, correctCount, incorrectCount, correctAnswers, incorrectAnswers], (err) => {
-    if (err) {
-      console.error("❌ Error guardando datos:", err);
-      return res.status(500).json({ error: "Error guardando respuestas" });
+  db.query(
+    query,
+    [username, age, group, school, correctCount, incorrectCount, correctAnswers, incorrectAnswers],
+    (err, results) => {
+      if (err) {
+        console.error("❌ Error guardando datos:", err);
+        return res.status(500).json({ error: "Error guardando respuestas" });
+      }
+      res.json({
+        message: "✅ Respuestas guardadas correctamente",
+        correctCount,
+        incorrectCount,
+        correctAnswers,
+        incorrectAnswers
+      });
     }
-    res.json({
-      message: "✅ Respuestas guardadas correctamente",
-      correctCount,
-      incorrectCount,
-      correctAnswers,
-      incorrectAnswers
-    });
-  });
+  );
 });
 
 // Consultar respuestas
@@ -85,6 +108,8 @@ app.get("/results", (req, res) => {
   });
 });
 
+// Arrancar servidor
 app.listen(port, () => {
   console.log(`🚀 Servidor escuchando en http://localhost:${port}`);
 });
+
