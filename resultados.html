@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Consulta de Resultados</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f4f4f4;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: white;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background: #333;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+    button {
+      padding: 10px 15px;
+      margin: 20px 0;
+      background: #007BFF;
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Resultados de la Base de Datos</h1>
+  <button onclick="cargarDatos()">Consultar Resultados</button>
+  
+  <table id="tablaResultados">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Correo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Aquí se insertarán las filas -->
+    </tbody>
+  </table>
+
+  <script>
+    async function cargarDatos() {
+      try {
+        const response = await fetch('/api/resultados'); // 👈 Ajusta la ruta según tu backend
+        if (!response.ok) throw new Error("Error al obtener datos");
+        
+        const data = await response.json();
+        const tbody = document.querySelector("#tablaResultados tbody");
+        tbody.innerHTML = "";
+
+        data.forEach(item => {
+          const row = `
+            <tr>
+              <td>${item.id}</td>
+              <td>${item.nombre}</td>
+              <td>${item.correo}</td>
+            </tr>
+          `;
+          tbody.innerHTML += row;
+        });
+      } catch (error) {
+        alert("No se pudieron cargar los resultados: " + error.message);
+      }
+    }
+  </script>
+</body>
+</html>
