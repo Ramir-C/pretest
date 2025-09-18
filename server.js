@@ -32,7 +32,7 @@ db.connect(err=>{
       username VARCHAR(100) NOT NULL,
       age INT NOT NULL,
       grupo VARCHAR(50) NOT NULL,
-      escuela VARCHAR(100) NOT NULL,
+      school VARCHAR(100) NOT NULL,
       correctCount INT,
       incorrectCount INT,
       correctAnswers TEXT,
