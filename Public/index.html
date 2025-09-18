@@ -92,75 +92,72 @@
         <div id="resultMessage"></div>
     </div>
 
-    <script>
-        const correctAnswers = {
-            q1: 'b',
-            q2: 'a',
-            q3: 'c',
-            q4: 'c',
-            q5: 'b',
-            q6: 'b',
-            q7: 'a',
-            q8: 'c',
-            q9: 'b',
-            q10: 'c'
-        };
-
-        document.getElementById("submitButton").addEventListener("click", async () => {
-            const form = document.getElementById("diagnosticForm");
-            const formData = new FormData(form);
-
-            const userData = {
-  username: formData.get('username'),
-  age: formData.get('age'),
-  grupo: formData.get('grupo'), // mapear group → grupo
-  school: formData.get('school'),
-  correctCount,
-  incorrectCount,
-  correctAnswers,
-  incorrectAnswers
+<script>
+const correctAnswers = {
+    q1: 'b', q2: 'a', q3: 'c', q4: 'c', q5: 'b',
+    q6: 'b', q7: 'a', q8: 'c', q9: 'b', q10: 'c'
 };
 
-            let allAnswered = true;
-            for (let i = 1; i <= 10; i++) {
-                const answer = formData.get('q' + i);
-                if (!answer) allAnswered = false;
-                userData.answers['q' + i] = answer;
-                if(answer === correctAnswers['q' + i]) {
-                    userData.correctCount++;
-                    userData.correctAnswers.push(`q${i}${answer}`);
-                } else {
-                    userData.incorrectCount++;
-                    userData.incorrectAnswers.push(`q${i}${answer}`);
-                }
-            }
+document.getElementById("submitButton").addEventListener("click", async () => {
+    const form = document.getElementById("diagnosticForm");
+    const formData = new FormData(form);
 
-            if (!allAnswered) {
-                alert("Por favor responde todas las preguntas.");
-                return;
-            }
+    // Inicialización de datos
+    const userData = {
+        username: formData.get('username'),
+        age: formData.get('age'),
+        grupo: formData.get('grupo'),
+        school: formData.get('school'),
+        correctCount: 0,
+        incorrectCount: 0,
+        correctAnswers: [],
+        incorrectAnswers: [],
+        answers: {}
+    };
 
-            userData.correctAnswers = userData.correctAnswers.join(',');
-            userData.incorrectAnswers = userData.incorrectAnswers.join(',');
+    let allAnswered = true;
 
-            try {
-                const response = await fetch("/respuestas1", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(userData)
-                });
-                const data = await response.json();
+    for (let i=1; i<=10; i++) {
+        const answer = formData.get('q'+i);
+        if(!answer) allAnswered = false;
+        userData.answers['q'+i] = answer;
+        if(answer === correctAnswers['q'+i]) {
+            userData.correctCount++;
+            userData.correctAnswers.push(`q${i}${answer}`);
+        } else {
+            userData.incorrectCount++;
+            userData.incorrectAnswers.push(`q${i}${answer}`);
+        }
+    }
 
-                document.getElementById("resultMessage").innerHTML = `
-                    <p>${data.message}</p>
-                    <p>Respuestas correctas: ${data.correctAnswers}</p>
-                    <p>Respuestas incorrectas: ${data.incorrectAnswers}</p>
-                `;
-            } catch (err) {
-                console.error(err);
-                alert("Hubo un error al enviar las respuestas.");
-            }
+    if(!allAnswered) {
+        alert("Por favor responde todas las preguntas.");
+        return;
+    }
+
+    // Convertir arrays a texto
+    userData.correctAnswers = userData.correctAnswers.join(',');
+    userData.incorrectAnswers = userData.incorrectAnswers.join(',');
+
+    try {
+        const response = await fetch("/respuestas1", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(userData)
         });
-    </script>
+        const data = await response.json();
+
+        document.getElementById("resultMessage").innerHTML = `
+            <p>${data.message}</p>
+            <p>Correctas: ${data.correctAnswers}</p>
+            <p>Incorrectas: ${data.incorrectAnswers}</p>
+        `;
+        form.reset();
+    } catch(err) {
+        console.error(err);
+        alert("Hubo un error al enviar las respuestas.");
+    }
+});
+</script>
 </body>
 </html>
