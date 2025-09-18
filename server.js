@@ -8,12 +8,18 @@ require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Middlewares
 app.use(cors());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true })); // 👈 para formularios normales
 app.use(express.static(path.join(__dirname, "public")));
 
-app.get("/", (req,res)=>res.sendFile(path.join(__dirname,"public","index.html")));
+// Ruta principal
+app.get("/", (req, res) =>
+  res.sendFile(path.join(__dirname, "public", "index.html"))
+);
 
+// Conexión MySQL
 const db = mysql.createConnection({
   host: process.env.MYSQLHOST,
   port: process.env.MYSQLPORT || 3306,
@@ -22,8 +28,11 @@ const db = mysql.createConnection({
   database: process.env.MYSQLDATABASE
 });
 
-db.connect(err=>{
-  if(err){ console.error("❌ Error MySQL:",err); return; }
+db.connect((err) => {
+  if (err) {
+    console.error("❌ Error MySQL:", err);
+    return;
+  }
   console.log("✅ Conectado a MySQL");
 
   const query = `
@@ -40,29 +49,67 @@ db.connect(err=>{
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `;
-  db.query(query, (err)=>{ if(err) console.error("❌ Error creando tabla:",err); else console.log("✅ Tabla lista"); });
+  db.query(query, (err) => {
+    if (err) console.error("❌ Error creando tabla:", err);
+    else console.log("✅ Tabla 'respuestas1' lista");
+  });
 });
 
-app.post("/respuestas1",(req,res)=>{
-  console.log("Datos recibidos:", req.body);
-  const {username, age, grupo, school, correctCount, incorrectCount, correctAnswers, incorrectAnswers} = req.body;
-  if(!username||!age||!grupo||!school) return res.status(400).json({error:"Datos incompletos"});
-  const query = `INSERT INTO respuestas1 (username,age,grupo,escuela,correctCount,incorrectCount,correctAnswers,incorrectAnswers) VALUES (?,?,?,?,?,?,?,?)`;
-  db.query(query,[username, age, grupo, school, correctCount, incorrectCount, correctAnswers, incorrectAnswers],
-    (err)=>{
-      if(err){ console.error("❌ Error guardando:",err); return res.status(500).json({error:"Error guardando"});}
-      res.json({message:"✅ Respuestas guardadas correctamente", correctAnswers, incorrectAnswers});
-    });
+// Guardar respuestas
+app.post("/respuestas1", (req, res) => {
+  console.log("📩 Datos recibidos:", req.body);
+  const {
+    username,
+    age,
+    grupo,
+    school,
+    correctCount,
+    incorrectCount,
+    correctAnswers,
+    incorrectAnswers
+  } = req.body;
+
+  if (!username || !age || !grupo || !school) {
+    return res.status(400).json({ error: "Datos incompletos" });
+  }
+
+  const query = `
+    INSERT INTO respuestas1
+    (username, age, grupo, school, correctCount, incorrectCount, correctAnswers, incorrectAnswers)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  db.query(
+    query,
+    [username, age, grupo, school, correctCount, incorrectCount, correctAnswers, incorrectAnswers],
+    (err) => {
+      if (err) {
+        console.error("❌ Error guardando:", err);
+        return res.status(500).json({ error: "Error guardando respuestas" });
+      }
+      res.json({
+        message: "✅ Respuestas guardadas correctamente",
+        correctAnswers,
+        incorrectAnswers
+      });
+    }
+  );
 });
 
-app.get("/respuestas1",(req,res)=>{
-  db.query("SELECT * FROM respuestas1 ORDER BY created_at DESC",(err,rows)=>{
-    if(err){ console.error(err); return res.status(500).json({error:"Error obteniendo respuestas"});}
+// Consultar respuestas
+app.get("/respuestas1", (req, res) => {
+  db.query("SELECT * FROM respuestas1 ORDER BY created_at DESC", (err, rows) => {
+    if (err) {
+      console.error("❌ Error consultando:", err);
+      return res.status(500).json({ error: "Error obteniendo respuestas" });
+    }
     res.json(rows);
   });
 });
 
-app.listen(port,()=>console.log(`🚀 Servidor escuchando en http://localhost:${port}`));
+// Iniciar servidor
+app.listen(port, () =>
+  console.log(`🚀 Servidor escuchando en http://localhost:${port}`)
+);
 
-
-
+ 
