@@ -55,7 +55,7 @@ db.connect((err) => {
 });
 
 // Guardar respuestas
-app.post("/save", (req, res) => {
+app.post("/respuestas1", (req, res) => {
   const {
     username,
     age,
