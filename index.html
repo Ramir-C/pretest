@@ -110,7 +110,7 @@
             const form = document.getElementById("diagnosticForm");
             const formData = new FormData(form);
 
-            const userData = {
+           const userData = {
   username: formData.get('username'),
   age: formData.get('age'),
   grupo: formData.get('group'), // mapear group → grupo
@@ -120,6 +120,7 @@
   correctAnswers,
   incorrectAnswers
 };
+
 
 
             let allAnswered = true;
