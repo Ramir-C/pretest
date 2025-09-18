@@ -44,6 +44,7 @@ db.connect(err=>{
 });
 
 app.post("/respuestas1",(req,res)=>{
+  console.log("Datos recibidos:", req.body);
   const {username, age, grupo, school, correctCount, incorrectCount, correctAnswers, incorrectAnswers} = req.body;
   if(!username||!age||!grupo||!school) return res.status(400).json({error:"Datos incompletos"});
   const query = `INSERT INTO respuestas1 (username,age,grupo,escuela,correctCount,incorrectCount,correctAnswers,incorrectAnswers) VALUES (?,?,?,?,?,?,?,?)`;
