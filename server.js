@@ -1,23 +1,19 @@
-// server.js
 const express = require("express");
 const mysql = require("mysql2");
 const bodyParser = require("body-parser");
 const path = require("path");
+const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware
+app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, "public"))); // Servir index.html y estilos desde /public
+app.use(express.static(path.join(__dirname, "public")));
 
-// Ruta raíz
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
+app.get("/", (req,res)=>res.sendFile(path.join(__dirname,"public","index.html")));
 
-// Conexión MySQL
 const db = mysql.createConnection({
   host: process.env.MYSQLHOST,
   port: process.env.MYSQLPORT || 3306,
@@ -26,16 +22,12 @@ const db = mysql.createConnection({
   database: process.env.MYSQLDATABASE
 });
 
-db.connect((err) => {
-  if (err) {
-    console.error("❌ Error al conectar a MySQL:", err);
-    return;
-  }
+db.connect(err=>{
+  if(err){ console.error("❌ Error MySQL:",err); return; }
   console.log("✅ Conectado a MySQL");
 
-  // Crear tabla si no existe
-  const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS respuestas1 (
+  const query = `
+    CREATE TABLE IF NOT EXISTS respuestas1(
       id INT AUTO_INCREMENT PRIMARY KEY,
       username VARCHAR(100) NOT NULL,
       age INT NOT NULL,
@@ -48,69 +40,28 @@ db.connect((err) => {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `;
-  db.query(createTableQuery, (err) => {
-    if (err) console.error("❌ Error creando tabla:", err);
-    else console.log("✅ Tabla 'respuestas1' lista.");
-  });
+  db.query(query, (err)=>{ if(err) console.error("❌ Error creando tabla:",err); else console.log("✅ Tabla lista"); });
 });
 
-// Guardar respuestas
-app.post("/respuestas1", (req, res) => {
-  const {
-    username,
-    age,
-    grupo, // mapeado desde front-end
-    school,
-    correctCount,
-    incorrectCount,
-    correctAnswers,
-    incorrectAnswers
-  } = req.body;
-
-  // Validación básica
-  if (!username || !age || !grupo || !school) {
-    return res.status(400).json({ error: "Datos incompletos" });
-  }
-
-  const query = `
-    INSERT INTO respuestas1
-    (username, age, grupo, escuela, correctCount, incorrectCount, correctAnswers, incorrectAnswers)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `;
-
-  db.query(
-    query,
-    [username, age, grupo, school, correctCount, incorrectCount, correctAnswers, incorrectAnswers],
-    (err, results) => {
-      if (err) {
-        console.error("❌ Error guardando datos:", err);
-        return res.status(500).json({ error: "Error guardando respuestas" });
-      }
-      res.json({
-        message: "✅ Respuestas guardadas correctamente",
-        correctCount,
-        incorrectCount,
-        correctAnswers,
-        incorrectAnswers
-      });
-    }
-  );
+app.post("/respuestas1",(req,res)=>{
+  const {username, age, grupo, school, correctCount, incorrectCount, correctAnswers, incorrectAnswers} = req.body;
+  if(!username||!age||!grupo||!school) return res.status(400).json({error:"Datos incompletos"});
+  const query = `INSERT INTO respuestas1 (username,age,grupo,escuela,correctCount,incorrectCount,correctAnswers,incorrectAnswers) VALUES (?,?,?,?,?,?,?,?)`;
+  db.query(query,[username, age, grupo, school, correctCount, incorrectCount, correctAnswers, incorrectAnswers],
+    (err)=>{
+      if(err){ console.error("❌ Error guardando:",err); return res.status(500).json({error:"Error guardando"});}
+      res.json({message:"✅ Respuestas guardadas correctamente", correctAnswers, incorrectAnswers});
+    });
 });
 
-// Consultar respuestas
-app.get("/respuestas1", (req, res) => {
-  db.query("SELECT * FROM respuestas1 ORDER BY created_at DESC", (err, rows) => {
-    if (err) {
-      console.error("❌ Error consultando datos:", err);
-      return res.status(500).json({ error: "Error obteniendo respuestas" });
-    }
+app.get("/respuestas1",(req,res)=>{
+  db.query("SELECT * FROM respuestas1 ORDER BY created_at DESC",(err,rows)=>{
+    if(err){ console.error(err); return res.status(500).json({error:"Error obteniendo respuestas"});}
     res.json(rows);
   });
 });
 
-// Arrancar servidor
-app.listen(port, () => {
-  console.log(`🚀 Servidor escuchando en http://localhost:${port}`);
-});
+app.listen(port,()=>console.log(`🚀 Servidor escuchando en http://localhost:${port}`));
+
 
 
