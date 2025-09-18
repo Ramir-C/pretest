@@ -58,7 +58,7 @@ app.post("/save", async (req, res) => {
 });
 
 // 🔹 Consultar resultados
-app.get("/respuestas", async (req, res) => {
+app.get("/respuestas1", async (req, res) => {
   try {
     const [rows] = await db.query("SELECT * FROM respuestas ORDER BY created_at DESC");
     res.json(rows);
