@@ -98,7 +98,7 @@ app.post("/respuestas1", (req, res) => {
 });
 
 // Consultar respuestas
-app.get("/results", (req, res) => {
+app.get("/respuestas1", (req, res) => {
   db.query("SELECT * FROM respuestas1 ORDER BY created_at DESC", (err, rows) => {
     if (err) {
       console.error("❌ Error consultando datos:", err);
