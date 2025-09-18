@@ -103,17 +103,18 @@ document.getElementById("submitButton").addEventListener("click", async () => {
     const formData = new FormData(form);
 
     // Inicialización de datos
-    const userData = {
-        username: formData.get('username'),
-        age: formData.get('age'),
-        grupo: formData.get('grupo'),
-        school: formData.get('school'),
-        correctCount: 0,
-        incorrectCount: 0,
-        correctAnswers: [],
-        incorrectAnswers: [],
-        answers: {}
-    };
+  const userData = {
+    username: formData.get('username'),
+    age: formData.get('age'),
+    grupo: formData.get('grupo'),
+    school: formData.get('school'),
+    correctCount: 0,
+    incorrectCount: 0,
+    correctAnswers: [],
+    incorrectAnswers: [],
+    answers: {}
+};
+
 
     let allAnswered = true;
 
